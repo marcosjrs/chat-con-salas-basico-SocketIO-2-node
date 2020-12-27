@@ -9,7 +9,8 @@ io.on('connection', (conexionDeUnCliente) => {
     //Enviando eventos al cliente
     conexionDeUnCliente.emit('chat:informacionDesdeServidor', {
         version: '0.0.1',
-        texto: 'Bienvenido al chat'
+        texto: 'Bienvenido al chat',
+        idUsuario: conexionDeUnCliente.id
     });
 
     //Escuchando eventos de cliente
@@ -34,6 +35,18 @@ io.on('connection', (conexionDeUnCliente) => {
         }
         //Enviamos el mensaje a todos los que están conectados a este servidor de socket de la sala del usuario que envio el mensaje
         io.sockets.to(mensaje.sala).emit('chat:nuevomensaje', mensaje);
+        //LLamamos a la función que nos indica el cliente (se ejecutará en el cliente)
+        callbackDeCliente({ ok:true });
+    });
+
+    conexionDeUnCliente.on('chat:mensajePrivado', (mensaje, callbackDeCliente) => {
+        if (!mensaje.nombre || !mensaje.sala || !mensaje.idUsuarioDestino) {
+            callbackDeCliente({ ok: false, mensaje: 'Faltan parametros', usuarios:[] });
+            return;
+        }
+        //Enviamos el mensaje a todos los que están conectados a este servidor de socket de la sala del usuario que envio el mensaje
+        conexionDeUnCliente.broadcast.to(mensaje.idUsuarioDestino).emit('chat:avisoMensajePrivado', mensaje);
+        console.log("->> ",mensaje.idUsuarioDestino);
         //LLamamos a la función que nos indica el cliente (se ejecutará en el cliente)
         callbackDeCliente({ ok:true });
     });

@@ -16,7 +16,8 @@ if (!params.has('nombre') || !params.has('sala')) {
     window.location = 'index.html';
 }
 var nombre = params.get('nombre');
-var sala = params.get('sala');
+var sala = params.has('privado') ? 'privado': params.get('sala');
+var idUsuario;
 
 //Muestra de valores iniciales en la vista
 $lblSala.text(sala);
@@ -26,10 +27,29 @@ $lblNombreUsuario.text(nombre);
 function actualizacionListadoUsuariosEnChat(usuarios){    
     let txtUsuarios = '';
     for (let i = 0; i < usuarios.length; i++) {
-        txtUsuarios += '<li><p>'+usuarios[i].nombre+'</p></li>';        
+        if(idUsuario !== usuarios[i].id){  
+            let idEnlace = idUsuario > usuarios[i].id ? idUsuario+"_"+usuarios[i].id : usuarios[i].id+"_"+idUsuario;        
+            txtUsuarios += '<li><p><span data-relacion="'+idEnlace+'"></span><a data-usuario-destino="'+usuarios[i].id+'" class="enlace-privado" href="chat.html?nombre='+nombre+'&privado=true&sala='+idEnlace+'" target="_blank">'+usuarios[i].nombre+'</a></p></li>';        
+        }else{
+            txtUsuarios += '<li><p>'+usuarios[i].nombre+'</p></li>';    
+        }
     }
     $listUsuarios.html(txtUsuarios);
     $panelUsuarios.scrollTop($listUsuarios[0].scrollHeight);
+    escucharAvisoMensajePrivado();
+}
+
+function escucharAvisoMensajePrivado(){
+    $(".enlace-privado").click(function(evt){
+        var idDestino = evt.target.attributes['data-usuario-destino'].value;
+        socket.emit(
+            'chat:mensajePrivado',
+            { nombre: nombre, idUsuario: idUsuario, sala: sala, idUsuarioDestino: idDestino },
+            function(infoPasadaPorServidor){
+                console.log('Respuesta Servidor: ',infoPasadaPorServidor);
+            }
+        );
+    });
 }
 
 //Listeners sobre eventos de los objetos de DOM
@@ -38,13 +58,15 @@ enviar.addEventListener('click', function (evt) {
     // que lo escucharán todos los clientes, para actualizar el chat de cada uno.
     socket.emit(
         'chat:mensaje',
-        { nombre: nombre, sala: sala , mensaje: $mensaje.val() },
+        { nombre: nombre, idUsuario: idUsuario, sala: sala , mensaje: $mensaje.val() },
         function(infoPasadaPorServidor){
             console.log('Respuesta Servidor: ',infoPasadaPorServidor);
         }
     );
     $mensaje.val("");
 });
+
+
 
 
 //Ejemplo de emisión desde cliente
@@ -65,6 +87,7 @@ socket.on('disconnect', function () {
     console.log('[cliente perdió conexión con servidor]');
 });
 socket.on('chat:informacionDesdeServidor', function (informacion) {
+    idUsuario = informacion.idUsuario;
     console.log(informacion);
 });
 
@@ -85,7 +108,7 @@ socket.on('chat:actualizacionUsuariosEnChat', function (datosDesdeServidor) {
 // Escuchamos cambios de mensajes
 socket.on('chat:nuevomensaje', function(mensaje){
     console.log(mensaje);
-    const claseSiEsMiMsg = mensaje.nombre == nombre ? 'mi-mensaje' : '';
+    const claseSiEsMiMsg = mensaje.idUsuario == idUsuario ? 'mi-mensaje' : '';
     mensajes.innerHTML += `<li class="left clearfix ${claseSiEsMiMsg}">
         <div class="chat-body clearfix">
             <div class="header">
@@ -95,6 +118,10 @@ socket.on('chat:nuevomensaje', function(mensaje){
         </div>
     </li>`; 
     $panelMensajes.scrollTop($listMensajes[0].scrollHeight);
+});
+socket.on('chat:avisoMensajePrivado', function(mensaje){
+    let idEnlace = mensaje.idUsuario > mensaje.idUsuarioDestino ? mensaje.idUsuario+"_"+mensaje.idUsuarioDestino : mensaje.idUsuarioDestino+"_"+mensaje.idUsuario;   
+    $("[data-relacion="+idEnlace+"]").text("(privado) ");    
 });
 
 
