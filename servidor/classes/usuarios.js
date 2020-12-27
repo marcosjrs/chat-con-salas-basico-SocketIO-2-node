@@ -13,8 +13,8 @@ class Usuarios {
      * @param {string} id 
      * @param {string} nombre 
      */
-    add(id, nombre) {
-        this.usuarios.push({ id, nombre });
+    add(id, nombre, sala) {
+        this.usuarios.push({ id, nombre, sala });
         return this.usuarios;
     }
 
@@ -51,7 +51,7 @@ class Usuarios {
      * @param {*} sala 
      */
     getBySala(sala){
-        //TODO
+        return this.usuarios.filter(function (u) { return u.sala === sala });
     }
 
 }

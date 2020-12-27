@@ -14,24 +14,31 @@ io.on('connection', (conexionDeUnCliente) => {
 
     //Escuchando eventos de cliente
     conexionDeUnCliente.on('chat:peticionEntradaDeUsuarioEnChat', (datosDesdeCliente, callbackDeCliente) => {
-        if (!datosDesdeCliente.nombre) {
-            callbackDeCliente({ ok: false, mensaje: 'Faltan parametros' });
-        } else {                   
-            usuarios.add(conexionDeUnCliente.id, datosDesdeCliente.nombre);
-            callbackDeCliente({ ok: true, usuario:datosDesdeCliente.nombre , usuarios: usuarios.getAll() });
-            conexionDeUnCliente.broadcast.emit('chat:entradaDeUsuarioEnChat', { usuario:usuarios.get(conexionDeUnCliente.id) });
+        if (!datosDesdeCliente.nombre || !datosDesdeCliente.sala) {
+            callbackDeCliente({ ok: false, mensaje: 'Faltan parametros', usuarios:[] });
+        } else {     
+            const sala = datosDesdeCliente.sala; 
+            conexionDeUnCliente.join(sala);        
+            usuarios.add(conexionDeUnCliente.id, datosDesdeCliente.nombre, sala);
+            callbackDeCliente({ ok: true, usuario:datosDesdeCliente.nombre , usuarios: usuarios.getBySala(sala) });
+            conexionDeUnCliente.broadcast.to(sala).emit('chat:entradaDeUsuarioEnChat', { usuario:usuarios.get(conexionDeUnCliente.id) });
             //Devolveremos todos los usuarios de la "sala" (por ahora no está integrada la parte de las salas)     
-            conexionDeUnCliente.broadcast.emit('chat:actualizacionUsuariosEnChat', { ok: true, usuario:datosDesdeCliente.nombre , usuarios: usuarios.getAll() });
+            conexionDeUnCliente.broadcast.to(sala).emit('chat:actualizacionUsuariosEnChat', { ok: true, usuario:datosDesdeCliente.nombre , usuarios: usuarios.getBySala(sala) });
         }
     });
 
     conexionDeUnCliente.on('disconnect', () => {
         console.log('[Cliente perdió o cerró la conexión con este servidor]');
         const usuario = usuarios.get(conexionDeUnCliente.id);
+        if(!usuario){
+            return;
+        }
+        const sala = usuario.sala;
         usuarios.del(conexionDeUnCliente.id);
-        conexionDeUnCliente.broadcast.emit('chat:salidaDeUsuarioEnChat', { usuario });
+        conexionDeUnCliente.broadcast.to(sala).emit('chat:salidaDeUsuarioEnChat', { usuario });
         //Devolveremos todos los usuarios de la "sala" (por ahora no está integrada la parte de las salas)  
-        conexionDeUnCliente.broadcast.emit('chat:actualizacionUsuariosEnChat', { ok: true, usuarios: usuarios.getAll() });
+        console.log(usuario);
+        conexionDeUnCliente.broadcast.to(sala).emit('chat:actualizacionUsuariosEnChat', { ok: true, usuarios: usuarios.getBySala(sala) });
     });
 
 

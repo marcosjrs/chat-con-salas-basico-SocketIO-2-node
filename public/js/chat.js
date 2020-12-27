@@ -2,16 +2,19 @@
 var socket = io(); // Hará que salte el listen de 'connection' en la parte Back
 
 //Elementos del DOM 
+var $lblSala = $("#lblSala");
 var $lblNombreUsuario = $("#lblNombreUsuario");
 var $lblEstado = $("#estado");
 var $listUsuarios = $("#usuarios");
 
 
 var params = new URLSearchParams(window.location.search);
-if (!params.has('nombre')) {
+if (!params.has('nombre') || !params.has('sala')) {
     window.location = 'index.html';
 }
 var nombre = params.get('nombre');
+var sala = params.get('sala');
+$lblSala.text(sala);
 $lblNombreUsuario.text(nombre);
 
 function actualizacionListadoUsuariosEnChat(usuarios){    
@@ -26,7 +29,7 @@ function actualizacionListadoUsuariosEnChat(usuarios){
 //Ejemplo de emisión desde cliente
 socket.emit(
     'chat:peticionEntradaDeUsuarioEnChat',
-    { nombre: nombre },
+    { nombre: nombre, sala: sala },
     function (infoPasadaPorServidor) {   
         console.log('Respuesta Servidor: ', infoPasadaPorServidor);    
         actualizacionListadoUsuariosEnChat(infoPasadaPorServidor.usuarios);
