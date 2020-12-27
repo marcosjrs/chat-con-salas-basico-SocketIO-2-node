@@ -1,3 +1,8 @@
+
+.pr-0{
+    padding-right: 0;
+}
+
 .aplicacion
 {
     list-style: none;
@@ -7,7 +12,7 @@
 
 .aplicacion li
 {
-    margin-bottom: 10px;
+    margin: 0 6px 5px 0px;
     padding-bottom: 5px;
     border-bottom: 1px dotted #B3A9A9;
 }
@@ -28,6 +33,7 @@
 {
     overflow-y: scroll;
     height: 250px;
+    padding: 0;
 }
 
 ::-webkit-scrollbar-track
