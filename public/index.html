@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aplicacion Socket.io</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="panel panel-primary">
+                    <div class="panel-heading" id="accordion">
+                        aplicacion
+                        <div class="btn-group pull-right">
+                            <a type="button" class="btn btn-default btn-xs" data-toggle="collapse"
+                                data-parent="#accordion" href="#collapseOne">
+                                >
+                            </a>
+                        </div>
+                    </div>
+                    <div class="panel-collapse collapse" id="collapseOne">
+                        <div class="panel-body">
+                            <ul id="mensajes" class="aplicacion">
+                            </ul>
+                        </div>
+                        <div class="panel-footer">
+                            <div id="estado"></div>
+                            <div class="form-group">
+                                <input id="usuario" type="text" class="form-control input-sm"
+                                    placeholder="Nombre de usuario" />
+                                <input id="mensaje" type="text" class="form-control input-sm" placeholder="Mensaje" />
+                            </div>
+                            <div>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-warning btn-sm" id="enviar">
+                                        Enviar</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <!-- el socket.io.js lo genera automáticamente el Socket.IO al conectarlo a nuestro "server"  -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+
+</html>
