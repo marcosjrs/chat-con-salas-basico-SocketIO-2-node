@@ -16,20 +16,21 @@ io.on('connection', (conexionDeUnCliente) => {
     conexionDeUnCliente.on('chat:peticionEntradaDeUsuarioEnChat', (datosDesdeCliente, callbackDeCliente) => {
         if (!datosDesdeCliente.nombre) {
             callbackDeCliente({ ok: false, mensaje: 'Faltan parametros' });
-        } else {
-            //Devolveremos todos los usuarios de la "sala" (por ahora no está integrada la parte de las salas)
-            
+        } else {                   
             usuarios.add(conexionDeUnCliente.id, datosDesdeCliente.nombre);
             callbackDeCliente({ ok: true, usuario:datosDesdeCliente.nombre , usuarios: usuarios.getAll() });
-
-            //Enviamos el mensaje a todos los que están conectados a este servidor de socket
-            //conexionDeUnCliente.broadcast.emit('chat:entradaDeUsuarioEnChat', { });
+            //Devolveremos todos los usuarios de la "sala" (por ahora no está integrada la parte de las salas)     
+            conexionDeUnCliente.broadcast.emit('chat:actualizacionUsuariosEnChat', { ok: true, usuario:datosDesdeCliente.nombre , usuarios: usuarios.getAll() });
         }
     });
 
     conexionDeUnCliente.on('disconnect', () => {
         console.log('[Cliente perdió o cerró la conexión con este servidor]');
+        const usuario = usuarios.get(conexionDeUnCliente.id);
         usuarios.del(conexionDeUnCliente.id);
+        conexionDeUnCliente.broadcast.emit('chat:salidaDeUsuarioEnChat', { usuarioSalio: usuario });
+        //Devolveremos todos los usuarios de la "sala" (por ahora no está integrada la parte de las salas)  
+        conexionDeUnCliente.broadcast.emit('chat:actualizacionUsuariosEnChat', { ok: true, usuarios: usuarios.getAll() });
     });
 
 
