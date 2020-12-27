@@ -19,6 +19,7 @@ io.on('connection', (conexionDeUnCliente) => {
         } else {                   
             usuarios.add(conexionDeUnCliente.id, datosDesdeCliente.nombre);
             callbackDeCliente({ ok: true, usuario:datosDesdeCliente.nombre , usuarios: usuarios.getAll() });
+            conexionDeUnCliente.broadcast.emit('chat:entradaDeUsuarioEnChat', { usuario:usuarios.get(conexionDeUnCliente.id) });
             //Devolveremos todos los usuarios de la "sala" (por ahora no está integrada la parte de las salas)     
             conexionDeUnCliente.broadcast.emit('chat:actualizacionUsuariosEnChat', { ok: true, usuario:datosDesdeCliente.nombre , usuarios: usuarios.getAll() });
         }
@@ -28,7 +29,7 @@ io.on('connection', (conexionDeUnCliente) => {
         console.log('[Cliente perdió o cerró la conexión con este servidor]');
         const usuario = usuarios.get(conexionDeUnCliente.id);
         usuarios.del(conexionDeUnCliente.id);
-        conexionDeUnCliente.broadcast.emit('chat:salidaDeUsuarioEnChat', { usuarioSalio: usuario });
+        conexionDeUnCliente.broadcast.emit('chat:salidaDeUsuarioEnChat', { usuario });
         //Devolveremos todos los usuarios de la "sala" (por ahora no está integrada la parte de las salas)  
         conexionDeUnCliente.broadcast.emit('chat:actualizacionUsuariosEnChat', { ok: true, usuarios: usuarios.getAll() });
     });

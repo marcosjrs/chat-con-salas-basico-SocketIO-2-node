@@ -47,12 +47,17 @@ socket.on('chat:informacionDesdeServidor', function (informacion) {
 
 // Escuchamos el evento emitido por el servidor, que lo emite cuando se le envia un mensaje nuevo
 // desde algún cliente.
+socket.on('chat:entradaDeUsuarioEnChat', function (datosDesdeServidor) {
+    $lblEstado.text("Entró en la sala "+datosDesdeServidor.usuario.nombre+"... ");
+    setTimeout(function(){$lblEstado.text("")}, 5000);
+});
+socket.on('chat:salidaDeUsuarioEnChat', function (datosDesdeServidor) {
+    $lblEstado.text("Salió de la sala "+datosDesdeServidor.usuario.nombre+"... ");
+    setTimeout(function(){$lblEstado.text("")}, 5000);
+});
 socket.on('chat:actualizacionUsuariosEnChat', function (datosDesdeServidor) { 
     actualizacionListadoUsuariosEnChat(datosDesdeServidor.usuarios);
 });
-socket.on('chat:salidaDeUsuarioEnChat', function (datosDesdeServidor) {
-    $lblEstado.text("Salió de la sala "+datosDesdeServidor.usuarioSalio.nombre+"... ");
-    setTimeout(function(){$lblEstado.text("")}, 5000);
-});
+
 
 
