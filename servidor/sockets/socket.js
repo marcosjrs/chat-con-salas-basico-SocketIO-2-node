@@ -27,6 +27,17 @@ io.on('connection', (conexionDeUnCliente) => {
         }
     });
 
+    conexionDeUnCliente.on('chat:mensaje', (mensaje, callbackDeCliente) => {
+        if (!mensaje.nombre || !mensaje.mensaje || !mensaje.sala) {
+            callbackDeCliente({ ok: false, mensaje: 'Faltan parametros', usuarios:[] });
+            return;
+        }
+        //Enviamos el mensaje a todos los que están conectados a este servidor de socket de la sala del usuario que envio el mensaje
+        io.sockets.to(mensaje.sala).emit('chat:nuevomensaje', mensaje);
+        //LLamamos a la función que nos indica el cliente (se ejecutará en el cliente)
+        callbackDeCliente({ ok:true });
+    });
+
     conexionDeUnCliente.on('disconnect', () => {
         console.log('[Cliente perdió o cerró la conexión con este servidor]');
         const usuario = usuarios.get(conexionDeUnCliente.id);

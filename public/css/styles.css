@@ -3,6 +3,10 @@
     padding-right: 0;
 }
 
+.mi-mensaje{
+    background-color: #f3f3f3;
+}
+
 .aplicacion
 {
     list-style: none;
@@ -36,6 +40,10 @@
     padding: 0;
 }
 
+.chat-body.clearfix {
+    padding-left: 6px;
+}
+
 ::-webkit-scrollbar-track
 {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
@@ -52,6 +60,10 @@
 {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     background-color: #555;
+}
+
+#mensajes{
+    margin-top: 3px;
 }
 
 
